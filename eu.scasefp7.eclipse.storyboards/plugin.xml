@@ -16,20 +16,44 @@
 
    <extension point="org.eclipse.ui.commands">
       <category id="eu.scasefp7.eclipse.storyboards.commands.category" name="Storyboards Commands Category"/>
-      <command categoryId="eu.scasefp7.eclipse.storyboards.commands.category" id="eu.scasefp7.eclipse.storyboards.commands.exportToOntology" name="Export to ontology"/>
+      <command
+            categoryId="eu.scasefp7.eclipse.storyboards.commands.category"
+            id="eu.scasefp7.eclipse.storyboards.commands.exportToOntology"
+            name="Export to ontology">
+         <commandParameter
+               id="fileName"
+               name="name"
+               optional="true">
+         </commandParameter>
+      </command>
       <command categoryId="eu.scasefp7.eclipse.storyboards.commands.category" id="eu.scasefp7.eclipse.storyboards.commands.exportAllToOntology" name="Export all storyboards to ontology"/>
    </extension>
 
    <extension point="org.eclipse.ui.handlers">
       <handler class="eu.scasefp7.eclipse.storyboards.handlers.ExportToOntologyHandler" commandId="eu.scasefp7.eclipse.storyboards.commands.exportToOntology">
       	 <enabledWhen>
-			<with variable="selection">
-				<iterate ifEmpty="false">
-					<adapt type="org.eclipse.core.resources.IResource">
-				    	<test property="org.eclipse.core.resources.name" value="*.sbd" />
-				    </adapt>
-				</iterate>
-           </with>
+           <or>
+              <adapt
+                    type="org.eclipse.core.resources.IResource">
+                 <test
+                       property="fileName"
+                       value="*.sbd">
+                 </test>
+              </adapt>
+              <with
+                    variable="selection">
+                 <iterate
+                       ifEmpty="false">
+                    <adapt
+                          type="org.eclipse.core.resources.IResource">
+                       <test
+                             property="org.eclipse.core.resources.name"
+                             value="*.sbd">
+                       </test>
+                    </adapt>
+                 </iterate>
+              </with>
+           </or>
 	     </enabledWhen>
       </handler>
       <handler class="eu.scasefp7.eclipse.storyboards.handlers.ExportAllStoryboardsToOntologyHandler" commandId="eu.scasefp7.eclipse.storyboards.commands.exportAllToOntology"/>

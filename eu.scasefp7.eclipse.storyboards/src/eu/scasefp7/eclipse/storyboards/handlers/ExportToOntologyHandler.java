@@ -15,8 +15,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -49,7 +51,17 @@ public class ExportToOntologyHandler extends ProjectAwareHandler {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 			List<Object> selectionList = structuredSelection.toList();
-			DynamicOntologyAPI ontology = new DynamicOntologyAPI(getProjectOfSelectionList(selectionList), true);
+			String fileName = event.getParameter("fileName");
+			DynamicOntologyAPI ontology;
+			//When handler is called from builder
+			if(fileName != null){
+				Path path = new Path(fileName);
+				IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+				//selectionList.add(file);
+				ontology = new DynamicOntologyAPI(file.getProject());
+			}
+			else
+				ontology = new DynamicOntologyAPI(getProjectOfSelectionList(selectionList), true);
 			// Iterate over the selected files
 			for (Object object : selectionList) {
 				IFile file = (IFile) Platform.getAdapterManager().getAdapter(object, IFile.class);
