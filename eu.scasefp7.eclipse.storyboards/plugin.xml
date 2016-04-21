@@ -58,7 +58,7 @@
       </handler>
       <handler class="eu.scasefp7.eclipse.storyboards.handlers.ExportAllStoryboardsToOntologyHandler" commandId="eu.scasefp7.eclipse.storyboards.commands.exportAllToOntology"/>
    </extension>
-   <extension
+   <!-- <extension
          point="org.eclipse.ui.menus">
       <menuContribution locationURI="popup:org.eclipse.ui.popup.any">
             <command commandId="eu.scasefp7.eclipse.storyboards.commands.exportToOntology" id="eu.scasefp7.eclipse.storyboards.menus.exportToOntology" icon="images/sample.gif">
@@ -84,6 +84,6 @@
                   </visibleWhen>
             </command>
       </menuContribution>
-   </extension>
+   </extension> -->
 
 </plugin>

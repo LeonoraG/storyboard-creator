@@ -10,11 +10,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
  */
 public class StoryboardsImportWizard extends Wizard implements IImportWizard {
 
-	private IWorkbench workbench;
+	protected IWorkbench workbench;
 
-	private IStructuredSelection selection;
+	protected IStructuredSelection selection;
 
-	private StoryboardsImportWizardPage diagramModelFilePage;
+	protected StoryboardsImportWizardPage diagramModelFilePage;
 
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		this.workbench = workbench;

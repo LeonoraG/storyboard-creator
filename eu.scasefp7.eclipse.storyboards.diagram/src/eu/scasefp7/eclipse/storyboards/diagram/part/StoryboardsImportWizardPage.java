@@ -21,6 +21,7 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -28,8 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.impl.ExtensibleURIConverterImpl;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -41,10 +41,42 @@ import org.eclipse.ui.part.FileEditorInput;
 /**
  * @generated NOT
  */
+@SuppressWarnings({ "restriction", "rawtypes" })
 public class StoryboardsImportWizardPage extends WizardFileSystemResourceImportPage1 {
+
+	private final String fileExtension;
 
 	public StoryboardsImportWizardPage(IWorkbench workbench, IStructuredSelection selection, String fileImportMask) {
 		super(workbench, selection);
+		fileExtension = fileImportMask;
+		if (selection != null && selection.isEmpty() == false && selection instanceof IStructuredSelection) {
+			IProject project = ProjectLocator.getProjectOfSelectionList((IStructuredSelection) selection);
+			String requirementsFolderLocation = null;
+			try {
+				requirementsFolderLocation = project.getPersistentProperty(new QualifiedName("",
+						"eu.scasefp7.eclipse.core.ui.rqsFolder"));
+			} catch (CoreException e) {
+				StoryboardsDiagramEditorPlugin.log("Error retrieving project property (requirements folder location)",
+						e);
+			}
+			String compositionsFolderLocation = requirementsFolderLocation;
+			try {
+				compositionsFolderLocation = project.getPersistentProperty(new QualifiedName("",
+						"eu.scasefp7.eclipse.core.ui.compFolder"));
+			} catch (CoreException e) {
+				StoryboardsDiagramEditorPlugin.log("Error retrieving project property (compositions folder location)",
+						e);
+			}
+			IContainer container = project;
+			if (fileExtension.equals("scd") && compositionsFolderLocation != null) {
+				if (project.findMember(new Path(compositionsFolderLocation)).exists())
+					container = (IContainer) project.findMember(new Path(compositionsFolderLocation));
+			} else if (fileExtension.equals("sbd") && requirementsFolderLocation != null) {
+				if (project.findMember(new Path(requirementsFolderLocation)).exists())
+					container = (IContainer) project.findMember(new Path(requirementsFolderLocation));
+			}
+			setContainerFieldValue(container.getFullPath().toString());
+		}
 	}
 
 	@Override
@@ -61,8 +93,8 @@ public class StoryboardsImportWizardPage extends WizardFileSystemResourceImportP
 			File fileSystemObject = (File) ((FileSystemElement) resourcesEnum.next()).getFileSystemObject();
 			String filename = fileSystemObject.getName();
 			int i = filename.lastIndexOf('.');
-			if (i <= 0 || !filename.substring(i + 1).equals("sbd")) {
-				setErrorMessage("All files imported must have the sbd extension!");
+			if (i <= 0 || !filename.substring(i + 1).equals(fileExtension)) {
+				setErrorMessage("All files imported must have the " + fileExtension + " extension!");
 				return false;
 			}
 			fileSystemObjects.add(fileSystemObject);
@@ -85,9 +117,9 @@ public class StoryboardsImportWizardPage extends WizardFileSystemResourceImportP
 						}
 						brlocal.close();
 					} catch (FileNotFoundException e) {
-						e.printStackTrace();
+						StoryboardsDiagramEditorPlugin.log("Error reading storyboard diagram from file system", e);
 					} catch (IOException e) {
-						e.printStackTrace();
+						StoryboardsDiagramEditorPlugin.log("Error reading storyboard diagram from file system", e);
 					}
 					String filedata = "";
 					for (String dataline : datalines) {
@@ -96,20 +128,22 @@ public class StoryboardsImportWizardPage extends WizardFileSystemResourceImportP
 					InputStream stream = new ByteArrayInputStream(filedata.getBytes(StandardCharsets.UTF_8));
 					IPath resourcePath = getResourcePath();
 					IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-					IProject project = root.getProject(resourcePath.toString());
-					project.getFile(fileName).create(stream, true, monitor);
+					IContainer container = (IContainer) root.findMember(resourcePath);
+					container.getFile(new Path(fileName)).create(stream, true, monitor);
 
-					IEditorDescriptor desc = PlatformUI.getWorkbench().
-					        getEditorRegistry().getDefaultEditor(file.getName());
+					IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry()
+							.getDefaultEditor(file.getName());
 					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-					page.openEditor(new FileEditorInput(project.getFile(fileName)), desc.getId());
+					page.openEditor(new FileEditorInput(container.getFile(new Path(fileName))), desc.getId());
 				}
 			};
 			try {
 				getContainer().run(false, true, op);
 			} catch (InterruptedException e) {
+				StoryboardsDiagramEditorPlugin.log("Error importing storyboard diagram", e);
 				return false;
 			} catch (InvocationTargetException e) {
+				StoryboardsDiagramEditorPlugin.log("Error importing storyboard diagram", e);
 				if (e.getTargetException() instanceof CoreException) {
 					ErrorDialog.openError(getContainer().getShell(), "Error in file creation", null,
 							((CoreException) e.getTargetException()).getStatus());

@@ -1,10 +1,13 @@
 package eu.scasefp7.eclipse.storyboards.diagram.part;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -29,6 +32,41 @@ import eu.scasefp7.eclipse.storyboards.provider.StoryboardsItemProviderAdapterFa
  * @generated
  */
 public class StoryboardsDiagramEditorPlugin extends AbstractUIPlugin {
+
+	/**
+	 * A UTC ISO 8601 date formatter used to log the time of errors.
+	 * 
+	 * @generated NOT
+	 */
+	private static final DateFormat formatter;
+	/**
+	 * @generated NOT
+	 */
+	static {
+		formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+	}
+
+	/**
+	 * The starting time of the current session for this plugin.
+	 * 
+	 * @generated NOT
+	 */
+	private static String STARTING_TIME;
+
+	/**
+	 * The current error ID for this session for this plugin.
+	 * 
+	 * @generated NOT
+	 */
+	private static int errorID;
+
+	/**
+	 * The plug-in ID.
+	 * 
+	 * @generated NOT
+	 */
+	public static final String PLUGIN_ID = "StoryboardsDiagram";
 
 	/**
 	 * @generated
@@ -77,7 +115,7 @@ public class StoryboardsDiagramEditorPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -85,6 +123,8 @@ public class StoryboardsDiagramEditorPlugin extends AbstractUIPlugin {
 		myLogHelper = new LogHelper(this);
 		PreferencesHint.registerPreferenceStore(DIAGRAM_PREFERENCES_HINT, getPreferenceStore());
 		adapterFactory = createAdapterFactory();
+		STARTING_TIME = formatter.format(new Date());
+		errorID = 0;
 	}
 
 	/**
@@ -270,5 +310,48 @@ public class StoryboardsDiagramEditorPlugin extends AbstractUIPlugin {
 	 */
 	public LogHelper getLogHelper() {
 		return myLogHelper;
+	}
+
+	/**
+	 * Logs an exception to the Eclipse log file. This method detects the class and the method in which the exception
+	 * was caught automatically using the current stack trace. If required, the user can override these values by
+	 * calling {@link #log(String, String, String, Exception)} instead.
+	 * 
+	 * @param message a human-readable message about the exception.
+	 * @param exception the exception that will be logged.
+	 * 
+	 * @generated NOT
+	 */
+	public static void log(String message, Exception exception) {
+		StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
+		log(stackTraceElement.getClassName(), stackTraceElement.getMethodName(), message, exception);
+	}
+
+	/**
+	 * Logs an exception to the Eclipse log file. Note that in most cases you can use the
+	 * {@link #log(String, Exception)} method which automatically detects the class and the method in which the
+	 * exception was caught, so it requires as parameters only a human-readable message and the exception.
+	 * 
+	 * @param className the name of the class in which the exception was caught.
+	 * @param methodName the name of the method in which the exception was caught.
+	 * @param message a human-readable message about the exception.
+	 * @param exception the exception that will be logged.
+	 * 
+	 * @generated NOT
+	 */
+	public static void log(String className, String methodName, String message, Exception exception) {
+		String msg = message;
+		msg += "\n!ERROR_ID t" + errorID;
+		msg += "\n!SERVICE_NAME Requirements Editor";
+		msg += "\n!SERVICE_VERSION 1.0.0-SNAPSHOT";
+		msg += "\n!STARTING_TIME " + STARTING_TIME;
+		msg += "\n!CLASS_NAME " + className;
+		msg += "\n!FUNCTION_NAME " + methodName;
+		msg += "\n!FAILURE_TIMESTAMP " + formatter.format(new Date());
+		errorID++;
+		if (instance != null)
+			instance.getLog().log(new Status(Status.ERROR, PLUGIN_ID, Status.OK, msg, exception));
+		else
+			exception.printStackTrace();
 	}
 }

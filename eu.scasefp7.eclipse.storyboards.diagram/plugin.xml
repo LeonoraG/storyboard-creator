@@ -5,6 +5,7 @@
    <extension point="org.eclipse.team.core.fileTypes" id="repo-ftype">
       <?gmfgen generated="false"?>
       <fileTypes type="text" extension="sbd"/>
+      <fileTypes type="text" extension="scd"/>
    </extension>
 
    <extension point="org.eclipse.emf.ecore.extension_parser" id="resource-factory">
@@ -15,13 +16,21 @@
       </parser>
    </extension>
 
+   <extension point="org.eclipse.emf.ecore.extension_parser" id="resource-factory-scd">
+      <?gmfgen generated="false"?>
+      <parser
+         type="scd"
+         class="org.eclipse.gmf.runtime.emf.core.resources.GMFResourceFactory">
+      </parser>
+   </extension>
+
    <extension point="org.eclipse.ui.editors" id="gmf-editor">
       <?gmfgen generated="false"?>
       <editor
          id="eu.scasefp7.eclipse.storyboards.diagram.part.StoryboardsDiagramEditorID"
          name="%editorName"
          icon="icons/obj16/StoryboardsDiagramFile.gif"
-         extensions="sbd"
+         extensions="sbd,scd"
          default="true"
          class="eu.scasefp7.eclipse.storyboards.diagram.part.StoryboardsDiagramEditor"
          matchingStrategy="eu.scasefp7.eclipse.storyboards.diagram.part.StoryboardsMatchingStrategy"
@@ -55,6 +64,22 @@
       </wizard>
    </extension>
 
+   <extension point="org.eclipse.ui.newWizards" id="creation-wizard-scd">
+      <?gmfgen generated="false"?>
+      <category
+            name="Storyboard Creator"
+            id="eu.scasefp7.eclipse.storyboards">
+      </category>
+  	  <wizard
+  	     name="Web Service Composition Storyboards Diagram"
+  	     icon="icons/obj16/StoryboardsDiagramFile.gif"
+  	     category="eu.scasefp7.eclipse.storyboards"
+  	     class="eu.scasefp7.eclipse.storyboards.diagram.part.ServiceCompositionStoryboardsCreationWizard"
+  	     id="eu.scasefp7.eclipse.storyboards.diagram.part.ServiceCompositionStoryboardsCreationWizardID">
+  	  	 <description>Creates Web Service Composition Storyboards Diagram.</description>  
+      </wizard>
+   </extension>
+
    <extension point="org.eclipse.ui.importWizards" id="import-wizard">
       <?gmfgen generated="false"?>
       <category
@@ -71,6 +96,22 @@
       </wizard>
    </extension>
 
+   <extension point="org.eclipse.ui.importWizards" id="import-wizard-scd">
+      <?gmfgen generated="false"?>
+      <category
+            name="Storyboard Creator"
+            id="eu.scasefp7.eclipse.storyboards">
+      </category>
+  	  <wizard
+  	     name="Web Service Composition Storyboards Diagram"
+  	     icon="icons/obj16/StoryboardsDiagramFile.gif"
+  	     category="eu.scasefp7.eclipse.storyboards"
+  	     class="eu.scasefp7.eclipse.storyboards.diagram.part.ServiceCompositionStoryboardsImportWizard"
+  	     id="eu.scasefp7.eclipse.storyboards.diagram.part.StoryboardsImportWizardID">
+  	  	 <description>Imports Web Service Composition Storyboards Diagram.</description>  
+      </wizard>
+   </extension>
+
    <extension point="org.eclipse.ui.exportWizards" id="export-wizard">
       <?gmfgen generated="false"?>
       <category
@@ -84,6 +125,22 @@
   	     class="eu.scasefp7.eclipse.storyboards.diagram.part.StoryboardsExportWizard"
   	     id="eu.scasefp7.eclipse.storyboards.diagram.part.StoryboardsExportWizardID">
   	  	 <description>%exportWizardDesc</description>  
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.exportWizards" id="export-wizard-scd">
+      <?gmfgen generated="false"?>
+      <category
+            name="Storyboard Creator"
+            id="eu.scasefp7.eclipse.storyboards">
+      </category>
+  	  <wizard
+  	     name="Web Service Composition Storyboards Diagram"
+  	     icon="icons/obj16/StoryboardsDiagramFile.gif"
+  	     category="eu.scasefp7.eclipse.storyboards"
+  	     class="eu.scasefp7.eclipse.storyboards.diagram.part.ServiceCompositionStoryboardsExportWizard"
+  	     id="eu.scasefp7.eclipse.storyboards.diagram.part.StoryboardsExportWizardID">
+  	  	 <description>Exports Web Service Composition Storyboards Diagram.</description>  
       </wizard>
    </extension>
 
@@ -538,6 +595,76 @@
 	              <and>
     	             <instanceof value="org.eclipse.core.resources.IFile"/>
         	         <test property="org.eclipse.core.resources.extension" value="sbd"/>
+                  </and>
+                  <instanceof value="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsAbstractNavigatorItem"/>
+               </or>
+            </parentExpression>
+         </commonSorter>
+      </navigatorContent>
+      <navigatorContent
+            id="eu.scasefp7.eclipse.storyboards.diagram.domainResourceContent" 
+            name="%domainNavigatorContentName" 
+            priority="normal" 
+            contentProvider="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsDomainNavigatorContentProvider" 
+            labelProvider="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsDomainNavigatorLabelProvider"
+            icon="icons/obj16/StoryboardsDiagramFile.gif"
+            activeByDefault="true">
+         <triggerPoints>
+            <or>
+	           <and>
+    	          <instanceof value="org.eclipse.core.resources.IFile"/>
+        	      <test property="org.eclipse.core.resources.extension" value="storyboards"/>
+               </and>
+               <instanceof value="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsDomainNavigatorItem"/>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <instanceof value="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsDomainNavigatorItem"/>
+         </possibleChildren>
+      </navigatorContent>
+      <actionProvider
+            id="eu.scasefp7.eclipse.storyboards.diagram.navigatorActionProvider"
+            class="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsNavigatorActionProvider">
+         <enablement>
+            <or>
+               <instanceof value="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsAbstractNavigatorItem"/>
+            </or>
+         </enablement>
+      </actionProvider>
+   </extension>
+
+   <extension point="org.eclipse.ui.navigator.navigatorContent" id="navigator-content">
+      <?gmfgen generated="true"?>
+      <navigatorContent
+            id="eu.scasefp7.eclipse.storyboards.diagram.resourceContent" 
+            name="%navigatorContentName" 
+            priority="normal" 
+            contentProvider="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsNavigatorContentProvider" 
+            labelProvider="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsNavigatorLabelProvider"
+            icon="icons/obj16/StoryboardsDiagramFile.gif"
+            activeByDefault="true">
+         <triggerPoints>
+            <or>
+	           <and>
+    	          <instanceof value="org.eclipse.core.resources.IFile"/>
+        	      <test property="org.eclipse.core.resources.extension" value="scd"/>
+               </and>
+               <instanceof value="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsAbstractNavigatorItem"/>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+         	   <instanceof value="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsAbstractNavigatorItem"/>
+            </or>
+         </possibleChildren>
+         <commonSorter 
+               id="eu.scasefp7.eclipse.storyboards.diagram.navigatorSorter" 
+               class="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsNavigatorSorter">
+            <parentExpression>
+               <or>
+	              <and>
+    	             <instanceof value="org.eclipse.core.resources.IFile"/>
+        	         <test property="org.eclipse.core.resources.extension" value="scd"/>
                   </and>
                   <instanceof value="eu.scasefp7.eclipse.storyboards.diagram.navigator.StoryboardsAbstractNavigatorItem"/>
                </or>
